@@ -1,5 +1,41 @@
-// IntelliSTAR Emulator - Interactive Features
+// IntelliSTAR Emulator - Chrome Optimized
+// Browser detection and validation
 
+function detectBrowser() {
+    const userAgent = navigator.userAgent;
+    const isChrome = /Chrome/.test(userAgent) && /Google Inc/.test(navigator.vendor);
+    const isEdgeChromium = /Edg/.test(userAgent);
+    
+    return isChrome || isEdgeChromium;
+}
+
+function showBrowserWarning() {
+    const checker = document.getElementById('browser-check');
+    checker.classList.add('show');
+    
+    const warning = document.createElement('div');
+    warning.className = 'browser-warning';
+    warning.innerHTML = `
+        <h1>⚠️ Chrome Required</h1>
+        <p>This IntelliSTAR Emulator is optimized for Google Chrome only.</p>
+        <p>For the best experience and full compatibility, please use Chrome browser.</p>
+        <a href="https://www.google.com/chrome/" target="_blank">Download Chrome</a>
+    `;
+    
+    checker.appendChild(warning);
+    document.querySelector('.intellistar-container').style.display = 'none';
+}
+
+// Check browser on page load
+window.addEventListener('load', () => {
+    if (!detectBrowser()) {
+        showBrowserWarning();
+        return;
+    }
+    console.log('%c✅ Chrome Detected - IntelliSTAR Emulator Ready', 'color: #2E7D32; font-size: 14px; font-weight: bold;');
+});
+
+// IntelliSTAR Weather Display Class
 class WeatherDisplay {
     constructor() {
         this.weather = {
@@ -17,10 +53,22 @@ class WeatherDisplay {
     }
     
     init() {
-        // Initialize animations
         this.animateClouds();
         this.animateSun();
         this.startWeatherUpdates();
+        this.logStartup();
+    }
+    
+    logStartup() {
+        console.log('%c🌤️ IntelliSTAR Emulator v1.0.0', 'color: #4a90e2; font-size: 16px; font-weight: bold;');
+        console.log('%cChrome Optimized | Ready for Testing', 'color: #2c5282; font-size: 12px;');
+        console.log('%c📋 Commands:', 'color: #4a90e2; font-weight: bold;');
+        console.log('  • weatherDisplay.updateLocation("Location", "Condition", temp)');
+        console.log('  • weatherDisplay.updateDetails(humidity, "WIND", windSpeed, "Gusts")');
+        console.log('  • weatherDisplay.checkPerformance()');
+        console.log('%c⌨️ Shortcuts:', 'color: #4a90e2; font-weight: bold;');
+        console.log('  • Ctrl+Shift+W: Update weather via dialog');
+        console.log('  • Ctrl+Shift+P: Performance stats');
     }
     
     animateClouds() {
@@ -37,28 +85,27 @@ class WeatherDisplay {
     }
     
     startWeatherUpdates() {
-        // Simulate weather updates every 30 seconds
         setInterval(() => {
             this.updateWeatherValues();
         }, 30000);
     }
     
     updateWeatherValues() {
-        // Slightly vary weather values to simulate real updates
         this.weather.tempNow = this.weather.tempNow + (Math.random() - 0.5) * 2;
         this.weather.humidity = Math.max(20, Math.min(90, this.weather.humidity + (Math.random() - 0.5) * 3));
-        
         this.renderWeatherDetails();
     }
     
     renderWeatherDetails() {
-        const tempElement = document.querySelector('.detail-value:first-of-type');
-        if (tempElement) {
-            tempElement.textContent = Math.round(this.weather.tempNow);
+        const detailItems = document.querySelectorAll('.detail-value');
+        if (detailItems.length > 0) {
+            detailItems[0].textContent = Math.round(this.weather.tempNow);
+        }
+        if (detailItems.length > 1) {
+            detailItems[1].textContent = Math.round(this.weather.humidity) + '%';
         }
     }
     
-    // Method to change location and weather
     updateLocation(location, condition, temp) {
         this.weather.location = location.toUpperCase();
         this.weather.condition = condition;
@@ -70,41 +117,52 @@ class WeatherDisplay {
         document.querySelector('.header-condition').textContent = condition;
         document.querySelector('.condition-label').textContent = condition;
         document.querySelector('.temp-value').textContent = this.weather.tempToday + '°';
+        
+        console.log(`%c📍 Location: ${location} | ${condition} | ${temp}°`, 'color: #FFD700; font-weight: bold;');
     }
     
-    // Method to update weather details
     updateDetails(humidity, wind, windSpeed, gusts) {
         this.weather.humidity = humidity;
         this.weather.wind = wind;
         this.weather.windSpeed = windSpeed;
         this.weather.gusts = gusts;
         
-        this.renderWeatherDetails();
+        const detailItems = document.querySelectorAll('.detail-value');
+        if (detailItems.length >= 4) {
+            detailItems[1].textContent = humidity + '%';
+            detailItems[2].textContent = wind + ' ' + windSpeed + ' MPH';
+            detailItems[3].textContent = gusts;
+        }
+        
+        console.log(`%c🌪️ Updated: Humidity ${humidity}% | Wind ${wind} ${windSpeed} MPH | Gusts ${gusts}`, 'color: #4a90e2; font-weight: bold;');
+    }
+    
+    checkPerformance() {
+        if (window.performance && window.performance.memory) {
+            const memData = {
+                'Used Heap': (window.performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB',
+                'Total Heap': (window.performance.memory.totalJSHeapSize / 1048576).toFixed(2) + ' MB',
+                'Limit': (window.performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + ' MB'
+            };
+            console.table(memData);
+        }
     }
 }
 
-// Initialize the display when DOM is loaded
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const display = new WeatherDisplay();
-    
-    // Make it available globally for console testing
     window.weatherDisplay = display;
-    
-    // Example: Log available methods
-    console.log('IntelliSTAR Emulator Loaded!');
-    console.log('Available methods:');
-    console.log('- weatherDisplay.updateLocation(location, condition, temp)');
-    console.log('- weatherDisplay.updateDetails(humidity, wind, windSpeed, gusts)');
-    console.log('\nExample usage:');
-    console.log("weatherDisplay.updateLocation('New York', 'Sunny', 75)");
 });
 
-// Optional: Add keyboard shortcuts for testing
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey) {
-        // Ctrl/Cmd + Shift + W to open weather update dialog
         if (e.shiftKey && e.key === 'W') {
             showWeatherDialog();
+        }
+        if (e.shiftKey && e.key === 'P') {
+            window.weatherDisplay?.checkPerformance();
         }
     }
 });
