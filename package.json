@@ -1,0 +1,28 @@
+{
+  "name": "intellistar-emulator",
+  "version": "1.0.0",
+  "description": "Chrome-optimized emulator of The Weather Channel's IntelliSTAR display system",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server",
+    "serve": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "weather",
+    "intellistar",
+    "weather-channel",
+    "chrome",
+    "emulator",
+    "display"
+  ],
+  "author": "ctree2088-sketch",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctree2088-sketch/intellistar-2.git"
+  },
+  "devDependencies": {},
+  "browserslist": [
+    "Chrome >= 90"
+  ]
+}
